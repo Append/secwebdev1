@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-var Photo = Ember.Object.extend({
+/*var Photo = Ember.Object.extend({
 	title: '',
 	username: '',
 	//flickr extra data
@@ -15,7 +15,7 @@ var Photo = Ember.Object.extend({
 		".staticflickr.com/"+this.get('server')+
 		"/"+this.get('id')+"_"+this.get('secret')+"_b.jpg";
 	}.property('farm','server','id','secret'),
-});
+});*/
 
 var PhotoCollection = Ember.ArrayProxy.extend(Ember.SortableMixin, {
 	sortProperties: ['dates.taken'],
@@ -27,6 +27,9 @@ export default Ember.Controller.extend({
 	photos: PhotoCollection.create(),
 	searchField: '',
 	tagSearchField: '',
+	filteredPhotosLoaded: function(){
+		return this.get('filteredPhotos').length >0;
+	}.property('filteredPhotos.length'),
 	tagList: ['hi','cheese'],
 
 	filteredPhotos: function () {
@@ -41,6 +44,7 @@ export default Ember.Controller.extend({
 
 	actions: {
 		search: function () {
+			this.set('loading', true);
 			this.get('photos').content.clear();
 			this.store.unloadAll('photo');
 			this.send('getPhotos',this.get('tagSearchField'));
@@ -83,6 +87,7 @@ export default Ember.Controller.extend({
 		},
 		clicktag: function(tag){
 			this.set('tagSearchField', tag);
+			this.set('loading', true);
 			this.get('photos').content.clear();
 			this.store.unloadAll('photo');
 			this.send('getPhotos',tag);
